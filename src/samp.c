@@ -36,6 +36,8 @@
 #include "samp.h"
 #include "internal.h"
 #include "parser.h"
+#include"stringbuffer.h"
+
 
 struct ln_sampRepos*
 ln_sampOpen(ln_ctx __attribute((unused)) ctx, const char *name)
@@ -346,7 +348,7 @@ done:	return r;
  * @returns the new subtree root (or NULL in case of error)
  */
 static inline int
-addSampToTree(ln_ctx ctx, es_str_t *rule, struct json_object *tagBucket)
+addSampToTree(ln_ctx ctx, es_str_t *rule, string_buffer *tagBucket)
 {
 	int r;
 	struct ln_ptree* subtree;
@@ -463,19 +465,20 @@ extendPrefix(ln_ctx ctx, const char *buf, es_size_t lenBuf, es_size_t offs)
  * @returns 0 on success, something else otherwise
  */
 static inline int
-addTagStrToBucket(ln_ctx ctx, es_str_t *tagname, struct json_object **tagBucket)
+addTagStrToBucket(ln_ctx ctx, es_str_t *tagname, string_buffer **tagBucket)
 {
 	int r = -1;
 	char *cstr;
-	struct json_object *tag; 
 
 	if(*tagBucket == NULL) {
-		CHKN(*tagBucket = json_object_new_array());
+		CHKN(*tagBucket = get_string_buffer());
 	}
 	cstr = es_str2cstr(tagname, NULL);
 	ln_dbgprintf(ctx, "tag found: '%s'", cstr);
-	CHKN(tag = json_object_new_string(cstr));
-	json_object_array_add(*tagBucket, tag);
+	if(add_to_buffer(*tagBucket,cstr) <= 0)
+	{
+		FAIL(LN_NOMEM);
+	}
 	free(cstr);
 	r = 0;
 
@@ -496,7 +499,7 @@ done:	return r;
  * @returns 0 on success, something else otherwise
  */
 static inline int
-processTags(ln_ctx ctx, const char *buf, es_size_t lenBuf, es_size_t *poffs, struct json_object **tagBucket)
+processTags(ln_ctx ctx, const char *buf, es_size_t lenBuf, es_size_t *poffs, string_buffer **tagBucket)
 {
 	int r = -1;
 	es_str_t *str = NULL;
@@ -549,7 +552,7 @@ processRule(ln_ctx ctx, const char *buf, es_size_t lenBuf, es_size_t offs)
 {
 	int r = -1;
 	es_str_t *str;
-	struct json_object *tagBucket = NULL;
+	string_buffer *tagBucket = NULL;
 
 	ln_dbgprintf(ctx, "sample line to add: '%s'\n", buf+offs);
 	CHKR(processTags(ctx, buf, lenBuf, &offs, &tagBucket));

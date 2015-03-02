@@ -93,7 +93,7 @@ ln_deletePTree(struct ln_ptree *tree)
 		goto done;
 
 	if(tree->tags != NULL)
-		json_object_put(tree->tags);
+		free_string_buffer(tree->tags);
 	for(node = tree->froot; node != NULL; node = nextnode) {
 		nextnode = node->next;
 		ln_deletePTreeNode(node);
@@ -823,9 +823,9 @@ ln_normalize(ln_ctx ctx, const char *str, size_t strLen, struct json_object **js
 		/* success, finalize event */
 		if(endNode->tags != NULL) {
 			/* add tags to an event */
-			json_object_get(endNode->tags);
-			json_object_object_add(*json_p, "event.tags", endNode->tags);
-			CHKR(ln_annotate(ctx, *json_p, endNode->tags));
+			struct json_object *tagBucket = tags_json_object(endNode->tags);
+			json_object_object_add(*json_p, "event.tags",tagBucket);
+			CHKR(ln_annotate(ctx, *json_p, tagBucket));
 		}
 	}
 

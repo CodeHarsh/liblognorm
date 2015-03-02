@@ -31,6 +31,7 @@
 #ifndef LIBLOGNORM_PTREE_H_INCLUDED
 #define	LIBLOGNORM_PTREE_H_INCLUDED
 #include <libestr.h>
+#include"stringbuffer.h"
 
 #define ORIGINAL_MSG_KEY "originalmsg"
 #define UNPARSED_DATA_KEY "unparsed-data"
@@ -75,7 +76,7 @@ struct ln_ptree {
 	struct {
 		unsigned isTerminal:1;	/**< designates this node a terminal sequence? */
 	} flags;
-	struct json_object *tags;	/* tags to assign to events of this type */
+	string_buffer *tags;	/* tags to assign to events of this type */
 	/* the respresentation below requires a lof of memory but is
 	 * very fast. As an alternate approach, we can use a hash table
 	 * where we ignore control characters. That should work quite well.
