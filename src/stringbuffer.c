@@ -34,14 +34,20 @@ void print_string_buffer(string_buffer *str_buf)
  */
 void free_string_buffer(string_buffer* str_buf)
 {
-	int i =0;
-	for(i=0;i<str_buf->length;i++)
+	if(str_buf)
 	{
-		free(str_buf->strs[i]);
+		int i =0;
+		int count=0;
+		for(i=0;i < (str_buf->length);i++)
+		{
+			count++;
+			free(str_buf->strs[i]);
+		}
+		str_buf->strs=0;
+		str_buf->length=0;
+		str_buf->size=0;
+		free(str_buf);
 	}
-	str_buf->strs=0;
-	str_buf->length=0;
-	str_buf->size=0;
 }
 
 /*
@@ -67,17 +73,18 @@ static inline int create_add_string_buf(string_buffer* str_buf,char *str)
  */
 int add_to_buffer (string_buffer* str_buf,char *str)
 {
+	int sizeIncrease =1;
 	if(str_buf->length + 1 < str_buf->size )
 	{
 		return create_add_string_buf(str_buf,str);
 	}
 	else
 	{
-		char** tmp = (char**)realloc(str_buf->strs,str_buf->size + 10 + sizeof(char*));
+		char** tmp = (char**)realloc(str_buf->strs,(str_buf->size + sizeIncrease) * sizeof(char*));
 		if(tmp!=NULL)
 		{
 			str_buf->strs = tmp;
-			str_buf->size+=10;
+			str_buf->size+=sizeIncrease;
 			return create_add_string_buf(str_buf,str);
 		}
 		else
