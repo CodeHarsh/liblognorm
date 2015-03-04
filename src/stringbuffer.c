@@ -65,18 +65,17 @@ static inline int create_add_string_buf(string_buffer* str_buf,char *str)
  */
 int add_to_buffer (string_buffer* str_buf,char *str)
 {
-	int sizeIncrease =1;
 	if(str_buf->length + 1 < str_buf->size )
 	{
 		return create_add_string_buf(str_buf,str);
 	}
 	else
-	{
-		char** tmp = (char**)realloc(str_buf->strs,(str_buf->size + sizeIncrease) * sizeof(char*));
+	{	int newSize =(str_buf->size>0)?(str_buf->size * 2):10;
+		char** tmp = (char**)realloc(str_buf->strs,(newSize) * sizeof(char*));
 		if(tmp!=NULL)
 		{
 			str_buf->strs = tmp;
-			str_buf->size+=sizeIncrease;
+			str_buf->size=newSize;
 			return create_add_string_buf(str_buf,str);
 		}
 		else
