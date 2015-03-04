@@ -11,9 +11,6 @@ string_buffer* get_string_buffer()
 {
 	string_buffer *str_buf=NULL;
 	str_buf = (string_buffer *) calloc(1,sizeof(string_buffer));
-	str_buf->strs=0;
-	str_buf->length=0;
-	str_buf->size=0;
 	return str_buf;
 }
 
@@ -32,21 +29,23 @@ void print_string_buffer(string_buffer *str_buf)
 /*
  * free the string buffer and assign to null
  */
-void free_string_buffer(string_buffer* str_buf)
+void free_string_buffer(string_buffer** str_buf)
 {
-	if(str_buf)
+	if(*str_buf)
 	{
 		int i =0;
 		int count=0;
-		for(i=0;i < (str_buf->length);i++)
+		for(i=0;i < ((*str_buf)->length);i++)
 		{
 			count++;
-			free(str_buf->strs[i]);
+			free((*str_buf)->strs[i]);
 		}
-		str_buf->strs=0;
-		str_buf->length=0;
-		str_buf->size=0;
-		free(str_buf);
+		free((*str_buf)->strs);
+		(*str_buf)->strs=0;
+		(*str_buf)->length=0;
+		(*str_buf)->size=0;
+		free(*str_buf);
+		*str_buf=0;
 	}
 }
 
@@ -55,14 +54,7 @@ void free_string_buffer(string_buffer* str_buf)
  */
 static inline int create_add_string_buf(string_buffer* str_buf,char *str)
 {
-	char *cstr = 0;
-	cstr = calloc((strlen(str) + 1),sizeof(char));
-	if(cstr==NULL)
-	{
-		free_string_buffer(str_buf);
-		return 0;
-	}
-	strcpy(cstr,str);
+	char *cstr = strdup(str);
 	str_buf->strs[str_buf->length]= cstr;
 	str_buf->length++;
 	return str_buf->length;
@@ -89,7 +81,7 @@ int add_to_buffer (string_buffer* str_buf,char *str)
 		}
 		else
 		{
-			free_string_buffer(str_buf);
+			free_string_buffer(&str_buf);
 			return 0;
 		}
 	}

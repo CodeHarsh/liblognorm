@@ -93,7 +93,7 @@ ln_deletePTree(struct ln_ptree *tree)
 		goto done;
 
 	if(tree->tags != NULL)
-		free_string_buffer(tree->tags);
+		free_string_buffer(&tree->tags);
 	for(node = tree->froot; node != NULL; node = nextnode) {
 		nextnode = node->next;
 		ln_deletePTreeNode(node);

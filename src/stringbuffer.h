@@ -24,7 +24,7 @@ void print_string_buffer(string_buffer *str_buf);
 /*
  * free the string buffer and assign to null
  */
-void free_string_buffer(string_buffer* str_buf);
+void free_string_buffer(string_buffer** str_buf);
 
 /*
  * Add new string pointer to string buffer returns current string buffer length

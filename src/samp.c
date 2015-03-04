@@ -468,7 +468,7 @@ static inline int
 addTagStrToBucket(ln_ctx ctx, es_str_t *tagname, string_buffer **tagBucket)
 {
 	int r = -1;
-	char *cstr;
+	char *cstr=0;
 
 	if(*tagBucket == NULL) {
 		CHKN(*tagBucket = get_string_buffer());
@@ -479,10 +479,11 @@ addTagStrToBucket(ln_ctx ctx, es_str_t *tagname, string_buffer **tagBucket)
 	{
 		FAIL(LN_NOMEM);
 	}
-	free(cstr);
 	r = 0;
 
-done:	return r;
+done:
+	free(cstr);
+	return r;
 }
 
 
